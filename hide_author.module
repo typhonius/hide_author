@@ -1,0 +1,24 @@
+<?php
+/**
+ * @file
+ * Code for the Hide Author module.
+ */
+
+/**
+ * Implements hook_node_presave
+ */
+// function hide_author_node_presave($node) {
+//   if ($node->type == 'confession' && $node->field_anonymous_post['und'][0]['value']) {
+//     $node->data = 'uid';
+//     dpm($node);
+//   }
+// }
+
+function hide_author_node_submit($node, $form, &$form_state) {
+  dpm($node);
+// maybe a $node->is_new or check to see if nid not there
+  if ($node->type == 'confession' && $node->field_anonymous_post['und'][0]['value']) {
+    $node->data = 'uid';
+  dpm($node);
+}
+}
