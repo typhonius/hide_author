@@ -27,14 +27,14 @@ function hide_author_install() {
   	node_type_save($content_type);
 	}
 
-  if (!in_array('confession', node_type_get_names())) {
+  if (!field_info_field('field_anonymous_post')) {
   	$field = array (
 	    'name' => 'field_anonymous_post',
 	    'field_name' => 'field_anonymous_post',
 	    'type' => 'list_boolean',
 	    'module' => 'list',
-	    'settings' => array (
-	      'allowed_values' => array (
+	    'settings' => array(
+	      'allowed_values' => array(
 	        0 => '',
 	        1 => '',
 	      ),
@@ -90,17 +90,21 @@ function hide_author_schema() {
     'fields' => array(
       'nid' => array(
         'description' => 'The {node}.nid for a node.',
-        'type' => 'serial',
-        'unsigned' => TRUE,
+        'type' => 'int',
         'not null' => TRUE,
       ),
       'uid' => array(
         'description' => 'The {users}.uid that owns this node; initially, this is the user that created it.',
         'type' => 'int',
-        'not null' => TRUE,
       ),
-		),
-		'foreign keys' => array(
+	  ),
+	  'unique_keys' => array(
+		  'nid' => array('nid'),
+	  ),
+    'primary_key' => array(
+      'nid' => array('nid'),
+    ),
+	  'foreign keys' => array(
       'node_author' => array(
         'table' => 'users',
         'columns' => array('uid' => 'uid'),

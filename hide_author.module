@@ -14,11 +14,12 @@
 //   }
 // }
 
-function hide_author_node_submit($node, $form, &$form_state) {
-  dpm($node);
-// maybe a $node->is_new or check to see if nid not there
-  if ($node->type == 'confession' && $node->field_anonymous_post['und'][0]['value']) {
-    $node->data = 'uid';
-  dpm($node);
-}
+function hide_author_node_presave($node, $form, &$form_state) {
+  // perhaps put it on presave or submit and drupal write record it. also on node delete do a dbd_elete
+  // maybe a $node->is_new or check to see if nid not there
+  if ($node->type == 'confession' && $node->field_anonymous_post['und'][0]['value'] && $node->is_new) {
+    $record = array('nid' => $node->nid, 'uid' => $node->uid);
+    drupal_write_record('hide_author', $record);
+    $node->uid = 0;
+  }
 }
