@@ -5,12 +5,29 @@
  */
 
 // TODO Create an admin page for users to peruse who actually posted stuff.
+// also add the option to allow deletes from the table on node_delete?
 
+/**
+ * Implements hook_node_insert
+ * @param object $node
+ */
 function hide_author_node_insert($node) {
   if ($node->type == 'confession' && $node->field_anonymous_post['und'][0]['value'] && $node->is_new) {
     $record = array('nid' => $node->nid, 'uid' => $node->uid);
     drupal_write_record('hide_author', $record);
     $node->uid = 0;
     drupal_write_record('node', $node, 'nid');
+  }
+}
+
+/**
+ * Implements hook_node_delete
+ * @param object $node
+ */
+function hide_author_node_delete($node) {
+  if ($node->type == 'confession') {
+    db_delete('hide_author')
+      ->condition('nid', $node->nid)
+      ->execute();
   }
 }
