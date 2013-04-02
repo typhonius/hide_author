@@ -4,22 +4,13 @@
  * Code for the Hide Author module.
  */
 
-/**
- * Implements hook_node_presave
- */
-// function hide_author_node_presave($node) {
-//   if ($node->type == 'confession' && $node->field_anonymous_post['und'][0]['value']) {
-//     $node->data = 'uid';
-//     dpm($node);
-//   }
-// }
+// TODO Create an admin page for users to peruse who actually posted stuff.
 
-function hide_author_node_presave($node, $form, &$form_state) {
-  // perhaps put it on presave or submit and drupal write record it. also on node delete do a dbd_elete
-  // maybe a $node->is_new or check to see if nid not there
+function hide_author_node_insert($node) {
   if ($node->type == 'confession' && $node->field_anonymous_post['und'][0]['value'] && $node->is_new) {
     $record = array('nid' => $node->nid, 'uid' => $node->uid);
     drupal_write_record('hide_author', $record);
     $node->uid = 0;
+    drupal_write_record('node', $node, 'nid');
   }
 }
