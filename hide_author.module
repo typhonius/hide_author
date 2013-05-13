@@ -6,6 +6,36 @@
 
 // TODO Create an admin page for users to peruse who actually posted stuff.
 // also add the option to allow deletes from the table on node_delete?
+/**
+ * Implements hook_menu
+ */
+function hide_author_menu() {
+  $items = array();
+  $items['admin/config/content/hide_author'] = array(
+    'title' => 'Hide Author',
+    'description' => 'Access administrative pages for Hide Author module',
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('hide_author_admin_page'),
+    'file' => 'hide_author.admin.inc',
+    'access arguments' => array('administer hide author'),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permissions
+ */
+function hide_author_permission() {
+  return array(
+    'administer hide author' => array(
+      'title' => t('Hide Author'),
+      'description' => t('Allows administrative access to the hide author page'),
+      'restrict access' => TRUE,
+    ),
+  );
+}
 
 /**
  * Implements hook_node_insert
