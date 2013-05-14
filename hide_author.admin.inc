@@ -20,8 +20,10 @@ function hide_author_admin_page() {
 */
   $query = db_select('hide_author', 'ha');
   $query->join('node', 'n', 'ha.nid = n.nid');
+  $query->join('users', 'u', 'ha.uid = u.uid');
   $query->fields('ha', array('nid', 'uid'))
     ->fields('n', array('title'))
+    ->fields('u', array('name'))
     ->extend('PagerDefault')
     ->limit(50)
     ->extend('TableSort')
@@ -31,8 +33,8 @@ function hide_author_admin_page() {
   $rows = array();
   foreach ($result as $record) {
     $rows[$record->nid]['nid'] = $record->nid;
-    $rows[$record->nid]['title'] = $record->title;
-    $rows[$record->nid]['uid'] = $record->uid;
+    $rows[$record->nid]['title'] = l($record->title, 'node/' . $record->nid);
+    $rows[$record->nid]['uid'] = l($record->name, 'user/' . $record->uid);
   }
  
   $form['rules'] = array(
