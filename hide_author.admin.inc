@@ -3,6 +3,26 @@
 /**
  * @file
  */
+function hide_author_admin_settings_page() {
+  $form = array();
+  $options = array('node' => t('Nodes'), 'comment' => t('Comments'));
+  $form['hide_author_enable'] = array(
+    '#title' => t('Enable'),
+    '#description' => t('Turn on the hide author functionality for the site'),
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#default_value' => variable_get('hide_author_enable', $options),
+  );
+  $form['hide_author_admin_save'] = array(
+    '#title' => t('Save Author'),
+    '#description' => t('Allow the module to save the anonymous author for administrative review'),
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#default_value' => variable_get('hide_author_admin_save', $options),
+  );
+
+  return system_settings_form($form);
+}
 
 function hide_author_admin_nodes_page() {
   $header = array(
