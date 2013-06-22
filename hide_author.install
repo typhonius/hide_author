@@ -85,26 +85,33 @@ function hide_author_install() {
  * Implements hook_schema
  */
 function hide_author_schema() {
-	$schema['hide_author'] = array(
-		'description' => 'An indexation table mapping nids to uids when users opt to be anonymous.',
+  $schema['hide_author'] = array(
+    'description' => 'An indexation table mapping nids to uids when users opt to be anonymous.',
     'fields' => array(
-      'nid' => array(
-        'description' => 'The {node}.nid for a node.',
+      'entity' => array(
+        'description' => 'The entity type.',
+        'type' => 'varchar',
+        'length' => 32,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'eid' => array(
+        'description' => 'The entity id for an entity.',
         'type' => 'int',
         'not null' => TRUE,
       ),
       'uid' => array(
-        'description' => 'The {users}.uid that owns this node; initially, this is the user that created it.',
+        'description' => 'The {users}.uid that owns this entity; initially, this is the user that created it.',
         'type' => 'int',
       ),
-	  ),
-	  'unique_keys' => array(
-		  'nid' => array('nid'),
-	  ),
-    'primary_key' => array(
-      'nid' => array('nid'),
     ),
-	  'foreign keys' => array(
+    'unique_keys' => array(
+      'eid' => array('eid'),
+    ),
+    'primary_key' => array(
+      'eid' => array('eid'),
+    ),
+    /*'foreign keys' => array(
       'node_author' => array(
         'table' => 'users',
         'columns' => array('uid' => 'uid'),
@@ -113,7 +120,7 @@ function hide_author_schema() {
       	'table' => 'node',
       	'columns' => array('nid' => 'nid'),
       ),
-    ),
+    ),*/
   );
 
   return $schema;

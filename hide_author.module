@@ -13,10 +13,32 @@ function hide_author_menu() {
   $items = array();
   $items['admin/config/content/hide_author'] = array(
     'title' => 'Hide Author',
-    'description' => 'Access administrative pages for Hide Author module',
+    'description' => 'Access administrative pages for hide author module.',
     'type' => MENU_NORMAL_ITEM,
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('hide_author_admin_page'),
+    'page arguments' => array('hide_author_admin_nodes_page'),
+    'file' => 'hide_author.admin.inc',
+    'access arguments' => array('administer hide author'),
+  );
+  $items['admin/config/content/hide_author/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/config/content/hide_author/comments'] = array(
+    'title' => 'Hidden Comments',
+    'description' => 'Access hidden comments.',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('hide_author_admin_comments_page'),
+    'file' => 'hide_author.admin.inc',
+    'access arguments' => array('administer hide author'),
+  );
+  $items['admin/config/content/hide_author/nodes'] = array(
+    'title' => 'Hidden Nodes',
+    'description' => 'Access hidden nodes',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('hide_author_admin_nodes_page'),
     'file' => 'hide_author.admin.inc',
     'access arguments' => array('administer hide author'),
   );
@@ -38,16 +60,33 @@ function hide_author_permission() {
 }
 
 /**
- * Implements hook_node_insert
- * @param object $node
+ * Implements hook_entity_insert
+ * @param object $entity
+ * @param object $type
  */
-function hide_author_node_insert($node) {
-  if ($node->type == 'confession' && $node->field_anonymous_post['und'][0]['value'] && $node->is_new) {
-    $record = array('nid' => $node->nid, 'uid' => $node->uid);
-    drupal_write_record('hide_author', $record);
-    $node->uid = 0;
-    drupal_write_record('node', $node, 'nid');
+function hide_author_entity_insert($entity, $type) {
+  if (isset($entity->field_anonymous_post) && $entity->field_anonymous_post['und'][0]['value']) {
+    switch ($type) {
+      case 'node':
+        if ($entity->type == 'confession' && $entity->is_new) {
+          hide_author_insert($entity, $type, $entity->nid);
+        }
+      break;
+      case 'comment':
+        if ($entity->node_type == 'comment_node_confession') {
+          hide_author_insert($entity, $type, $entity->cid);
+        }
+      break;
+    }  
   }
+}
+
+function hide_author_insert($entity, $type, $eid) {
+  $record = array('entity' => $type, 'eid' => $eid, 'uid' => $entity->uid);
+  drupal_write_record('hide_author', $record);
+  $entity->uid = 0;
+  $primary_key = ($type == 'node') ? 'nid' : 'cid';
+  drupal_write_record($type, $entity, $primary_key);
 }
 
 /**

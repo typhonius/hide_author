@@ -4,24 +4,17 @@
  * @file
  */
 
-function hide_author_admin_page() {
+function hide_author_admin_nodes_page() {
   $header = array(
-    'nid' => array('data' => t('NID'), 'field' => 'nid', 'sort' => 'desc'),
-    'Title' => array('data' => t('Title'), 'field' => 'nid'),
+    'eid' => array('data' => t('NID'), 'field' => 'eid', 'sort' => 'desc'),
+    'Title' => array('data' => t('Title'), 'field' => 'eid'),
     'uid' => array('data' => t('User'), 'field' => 'uid'),
   );
-  /*$header = array(
-    'title' => array('data' => t('Title'), 'field' => 'n.title'),
-    'type' => array('data' => t('Type'), 'field' => 'n.type'),
-    'author' => t('Author'),
-  );
-  $header['operations'] = array('data' => t('Operations'));
-  $query = db_select('node', 'n')->extend('PagerDefault')->extend('TableSort');
-*/
   $query = db_select('hide_author', 'ha');
-  $query->join('node', 'n', 'ha.nid = n.nid');
+  $query->join('node', 'n', 'ha.eid = n.nid');
   $query->join('users', 'u', 'ha.uid = u.uid');
-  $query->fields('ha', array('nid', 'uid'))
+  $query->fields('ha', array('eid', 'uid'))
+    ->condition('ha.entity', 'node','=')
     ->fields('n', array('title'))
     ->fields('u', array('name'))
     ->extend('PagerDefault')
@@ -32,9 +25,9 @@ function hide_author_admin_page() {
 
   $rows = array();
   foreach ($result as $record) {
-    $rows[$record->nid]['nid'] = $record->nid;
-    $rows[$record->nid]['title'] = l($record->title, 'node/' . $record->nid);
-    $rows[$record->nid]['uid'] = l($record->name, 'user/' . $record->uid);
+    $rows[$record->eid]['eid'] = $record->eid;
+    $rows[$record->eid]['title'] = l($record->title, 'node/' . $record->eid);
+    $rows[$record->eid]['uid'] = l($record->name, 'user/' . $record->uid);
   }
  
   $form['rules'] = array(
@@ -42,6 +35,43 @@ function hide_author_admin_page() {
     '#header' => $header,
     '#rows' => $rows,
     '#empty' => t('There are currently no nodes with a hidden author.'),
+  );
+
+  return $form;
+}
+
+function hide_author_admin_comments_page() {
+  $header = array(
+    'eid' => array('data' => t('CID'), 'field' => 'eid', 'sort' => 'desc'),
+    'Subject' => array('data' => t('Subject'), 'field' => 'eid'),
+    'uid' => array('data' => t('User'), 'field' => 'uid'),
+  );
+
+  $query = db_select('hide_author', 'ha');
+  $query->join('comment', 'c', 'ha.eid = c.cid');
+  $query->join('users', 'u', 'ha.uid = u.uid');
+  $query->fields('ha', array('eid', 'uid'))
+    ->condition('ha.entity', 'comment','=')
+    ->fields('c', array('subject'))
+    ->fields('u', array('name'))
+    ->extend('PagerDefault')
+    ->limit(50)
+    ->extend('TableSort')
+    ->orderByHeader($header);
+  $result = $query->execute();
+
+  $rows = array();
+  foreach ($result as $record) {
+    $rows[$record->eid]['eid'] = $record->eid;
+    $rows[$record->eid]['subject'] = l($record->subject, 'comment/' . $record->eid);
+    $rows[$record->eid]['uid'] = l($record->name, 'user/' . $record->uid);
+  }
+ 
+  $form['rules'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+    '#empty' => t('There are currently no comments with a hidden author.'),
   );
 
   return $form;
